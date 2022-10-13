@@ -129,8 +129,8 @@ final class HttpPipelineBuilder {
                 embeddedServices.getEventPublisher(HttpRequestReceivedEvent.class));
         responseEncoder = new HttpResponseEncoder(
                 embeddedServices.getMediaTypeCodecRegistry(),
-                server.getServerConfiguration()
-        );
+                server.getServerConfiguration(),
+                embeddedServices.getApplicationContext().getConversionService());
     }
 
     boolean supportsSsl() {
