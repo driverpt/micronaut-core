@@ -25,22 +25,21 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpVersion;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.FilterMatcher;
 import io.micronaut.http.bind.DefaultRequestBinderRegistry;
 import io.micronaut.http.bind.RequestBinderRegistry;
-import io.micronaut.http.client.HttpClientRegistry;
-import io.micronaut.http.client.StreamingHttpClientRegistry;
-import io.micronaut.http.client.ProxyHttpClient;
-import io.micronaut.http.client.HttpClientConfiguration;
 import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.StreamingHttpClient;
-import io.micronaut.http.client.ProxyHttpClientRegistry;
+import io.micronaut.http.client.HttpClientConfiguration;
+import io.micronaut.http.client.HttpClientRegistry;
 import io.micronaut.http.client.LoadBalancer;
 import io.micronaut.http.client.LoadBalancerResolver;
+import io.micronaut.http.client.ProxyHttpClient;
+import io.micronaut.http.client.ProxyHttpClientRegistry;
+import io.micronaut.http.client.StreamingHttpClient;
+import io.micronaut.http.client.StreamingHttpClientRegistry;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.http.client.filter.ClientFilterResolutionContext;
@@ -58,8 +57,8 @@ import io.micronaut.http.netty.channel.EventLoopGroupFactory;
 import io.micronaut.http.netty.channel.EventLoopGroupRegistry;
 import io.micronaut.inject.InjectionPoint;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import io.micronaut.json.JsonMapper;
 import io.micronaut.json.JsonFeatures;
+import io.micronaut.json.JsonMapper;
 import io.micronaut.json.codec.MapperMediaTypeCodec;
 import io.micronaut.scheduling.instrument.InvocationInstrumenterFactory;
 import io.micronaut.websocket.WebSocketClient;
@@ -414,14 +413,15 @@ class DefaultNettyHttpClientRegistry implements AutoCloseable,
                 codecRegistry,
                 WebSocketBeanRegistry.forClient(beanContext),
                 beanContext.findBean(RequestBinderRegistry.class).orElseGet(() ->
-                        new DefaultRequestBinderRegistry(ConversionService.SHARED)
+                        new DefaultRequestBinderRegistry(beanContext.getConversionService())
                 ),
                 eventLoopGroup,
                 resolveSocketChannelFactory(configuration, beanContext),
                 pipelineListeners,
                 clientCustomizer,
                 invocationInstrumenterFactories,
-                clientId
+                clientId,
+                beanContext.getConversionService()
         );
     }
 

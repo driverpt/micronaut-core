@@ -40,7 +40,7 @@ public class ConvertibleMultiValuesMap<V> implements ConvertibleMultiValues<V> {
     public static final ConvertibleMultiValues EMPTY = new ConvertibleMultiValuesMap<>(Collections.emptyMap());
 
     protected final Map<CharSequence, List<V>> values;
-    private final ConversionService<?> conversionService;
+    private final ConversionService conversionService;
 
     /**
      * Construct an empty {@link ConvertibleValuesMap}.
@@ -64,7 +64,7 @@ public class ConvertibleMultiValuesMap<V> implements ConvertibleMultiValues<V> {
      * @param values            The map
      * @param conversionService The conversion service
      */
-    public ConvertibleMultiValuesMap(Map<CharSequence, List<V>> values, ConversionService<?> conversionService) {
+    public ConvertibleMultiValuesMap(Map<CharSequence, List<V>> values, ConversionService conversionService) {
         this.values = wrapValues(values);
         this.conversionService = conversionService;
     }
@@ -137,4 +137,8 @@ public class ConvertibleMultiValuesMap<V> implements ConvertibleMultiValues<V> {
         return Collections.unmodifiableMap(values);
     }
 
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
 }

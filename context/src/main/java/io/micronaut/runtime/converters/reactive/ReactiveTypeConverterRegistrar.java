@@ -17,10 +17,10 @@ package io.micronaut.runtime.converters.reactive;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.core.convert.ConversionService;
+import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.convert.TypeConverterRegistrar;
-import org.reactivestreams.Publisher;
 import jakarta.inject.Singleton;
+import org.reactivestreams.Publisher;
 
 /**
  * Registers converters for Reactive types such as {@link Publisher}.
@@ -33,7 +33,7 @@ import jakarta.inject.Singleton;
 public class ReactiveTypeConverterRegistrar implements TypeConverterRegistrar {
 
     @Override
-    public void register(ConversionService<?> conversionService) {
+    public void register(MutableConversionService conversionService) {
         conversionService.addConverter(Object.class, Publisher.class, obj -> {
             if (obj instanceof Publisher) {
                 return (Publisher) obj;

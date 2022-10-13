@@ -168,6 +168,7 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
     private ExecutorService ioExecutor;
     private final ApplicationEventPublisher<HttpRequestTerminatedEvent> terminateEventPublisher;
     private final RouteExecutor routeExecutor;
+    private final ConversionService conversionService;
 
     /**
      * @param customizableResponseTypeHandlerRegistry The customizable response type handler registry
@@ -176,6 +177,7 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
      * @param ioExecutor                              The IO executor
      * @param httpContentProcessorResolver            The http content processor resolver
      * @param terminateEventPublisher                 The terminate event publisher
+     * @param conversionService                       The conversion service
      */
     RoutingInBoundHandler(
             NettyHttpServerConfiguration serverConfiguration,
@@ -183,7 +185,8 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
             NettyEmbeddedServices embeddedServerContext,
             Supplier<ExecutorService> ioExecutor,
             HttpContentProcessorResolver httpContentProcessorResolver,
-            ApplicationEventPublisher<HttpRequestTerminatedEvent> terminateEventPublisher) {
+            ApplicationEventPublisher<HttpRequestTerminatedEvent> terminateEventPublisher,
+            ConversionService conversionService) {
         this.mediaTypeCodecRegistry = embeddedServerContext.getMediaTypeCodecRegistry();
         this.customizableResponseTypeHandlerRegistry = customizableResponseTypeHandlerRegistry;
         this.staticResourceResolver = embeddedServerContext.getStaticResourceResolver();
@@ -197,6 +200,7 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
         Optional<Boolean> multipartEnabled = serverConfiguration.getMultipart().getEnabled();
         this.multipartEnabled = !multipartEnabled.isPresent() || multipartEnabled.get();
         this.routeExecutor = embeddedServerContext.getRouteExecutor();
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -1087,7 +1091,7 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
             } else {
 
                 MediaTypeCodec codec = mediaTypeCodecRegistry.findCodec(finalMediaType, message.getClass()).orElse(
-                        new TextPlainCodec(serverConfiguration.getDefaultCharset()));
+                        new TextPlainCodec(serverConfiguration.getDefaultCharset(), conversionService));
 
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Encoding emitted response object [{}] using codec: {}", message, codec);
@@ -1186,7 +1190,7 @@ class RoutingInBoundHandler extends SimpleChannelInboundHandler<io.micronaut.htt
                     MediaTypeCodec codec = registeredCodec.get();
                     encodeBodyWithCodec(message, bodyType, body, codec, context, request);
                 } else {
-                    MediaTypeCodec defaultCodec = new TextPlainCodec(serverConfiguration.getDefaultCharset());
+                    MediaTypeCodec defaultCodec = new TextPlainCodec(serverConfiguration.getDefaultCharset(), conversionService);
                     encodeBodyWithCodec(message, bodyType, body, defaultCodec, context, request);
                 }
             }

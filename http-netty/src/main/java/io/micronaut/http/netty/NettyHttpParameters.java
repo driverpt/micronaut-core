@@ -53,7 +53,7 @@ public class NettyHttpParameters implements MutableHttpParameters {
      * @param onChange A callback for changes
      */
     public NettyHttpParameters(Map<String, List<String>> parameters,
-                               ConversionService<?> conversionService,
+                               ConversionService conversionService,
                                @Nullable BiConsumer<CharSequence, List<String>> onChange) {
         this.valuesMap = new LinkedHashMap<>(parameters.size());
         this.values = new ConvertibleMultiValuesMap<>(valuesMap, conversionService);
@@ -107,5 +107,10 @@ public class NettyHttpParameters implements MutableHttpParameters {
             onChange.accept(name, valueList);
         }
         return this;
+    }
+
+    @Override
+    public ConversionService getConversionService() {
+        return values.getConversionService();
     }
 }

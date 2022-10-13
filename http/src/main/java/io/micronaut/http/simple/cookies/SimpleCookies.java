@@ -31,7 +31,7 @@ import java.util.*;
  */
 public class SimpleCookies implements Cookies {
 
-    private final ConversionService<?> conversionService;
+    private final ConversionService conversionService;
     private final Map<CharSequence, Cookie> cookies;
 
     /**

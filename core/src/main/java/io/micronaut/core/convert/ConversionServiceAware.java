@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.inject.generics;
+package io.micronaut.core.convert;
 
-import io.micronaut.core.convert.ConversionService;
+import io.micronaut.core.annotation.NonNull;
 
-import jakarta.inject.Inject;
+/**
+ * Interface for component to provide the access to its {@link ConversionService}.
+ *
+ * @author Denis Stepanov
+ * @since 4.0.0
+ */
+public interface ConversionServiceAware {
 
-public class WildCardInject {
-    // tests injecting field
-    @Inject
-    protected ConversionService conversionService;
+    /**
+     * @return the conversion service
+     */
+    @NonNull
+    ConversionService getConversionService();
 
-    // tests injecting constructor
-    public WildCardInject(ConversionService conversionService) {
-    }
-
-    // tests injection method
-    @Inject
-    public void setConversionService(ConversionService conversionService) {
-        this.conversionService = conversionService;
-    }
 }

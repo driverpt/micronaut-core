@@ -42,7 +42,7 @@ import java.util.concurrent.ExecutorService;
 @Internal
 class NettyBinderRegistrar implements BeanCreatedEventListener<RequestBinderRegistry> {
 
-    private final ConversionService<?> conversionService;
+    private final ConversionService conversionService;
     private final HttpContentProcessorResolver httpContentProcessorResolver;
     private final BeanLocator beanLocator;
     private final BeanProvider<HttpServerConfiguration> httpServerConfiguration;
@@ -58,7 +58,7 @@ class NettyBinderRegistrar implements BeanCreatedEventListener<RequestBinderRegi
      * @param executorService              The executor to offload blocking operations
      */
     NettyBinderRegistrar(
-            @Nullable ConversionService<?> conversionService,
+            @Nullable ConversionService conversionService,
             HttpContentProcessorResolver httpContentProcessorResolver,
             BeanLocator beanLocator,
             BeanProvider<HttpServerConfiguration> httpServerConfiguration,

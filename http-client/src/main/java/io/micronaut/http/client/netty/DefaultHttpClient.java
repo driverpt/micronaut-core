@@ -245,6 +245,7 @@ public class DefaultHttpClient implements
     private final RequestBinderRegistry requestBinderRegistry;
     private final List<InvocationInstrumenterFactory> invocationInstrumenterFactories;
     private final String informationalServiceId;
+    private final ConversionService conversionService;
 
     /**
      * Construct a client for the given arguments.
@@ -257,6 +258,7 @@ public class DefaultHttpClient implements
      * @param codecRegistry                   The {@link MediaTypeCodecRegistry} to use for encoding and decoding objects
      * @param annotationMetadataResolver      The annotation metadata resolver
      * @param invocationInstrumenterFactories The invocation instrumeter factories to instrument netty handlers execution with
+     * @param conversionService               The conversion service
      * @param filters                         The filters to use
      */
     public DefaultHttpClient(@Nullable LoadBalancer loadBalancer,
@@ -267,6 +269,7 @@ public class DefaultHttpClient implements
             MediaTypeCodecRegistry codecRegistry,
             @Nullable AnnotationMetadataResolver annotationMetadataResolver,
             List<InvocationInstrumenterFactory> invocationInstrumenterFactories,
+            ConversionService conversionService,
             HttpClientFilter... filters) {
         this(loadBalancer,
             configuration.getHttpVersion(),
@@ -278,12 +281,14 @@ public class DefaultHttpClient implements
             nettyClientSslBuilder,
             codecRegistry,
             WebSocketBeanRegistry.EMPTY,
-            new DefaultRequestBinderRegistry(ConversionService.SHARED),
+            new DefaultRequestBinderRegistry(conversionService),
             null,
             NioSocketChannel::new,
             Collections.emptySet(),
             CompositeNettyClientCustomizer.EMPTY,
-            invocationInstrumenterFactories, null);
+            invocationInstrumenterFactories,
+            null,
+            conversionService);
     }
 
     /**
@@ -305,6 +310,7 @@ public class DefaultHttpClient implements
      * @param clientCustomizer                The pipeline customizer
      * @param invocationInstrumenterFactories The invocation instrumeter factories to instrument netty handlers execution with
      * @param informationalServiceId          Optional service ID that will be passed to exceptions created by this client
+     * @param conversionService               The conversionService
      */
     public DefaultHttpClient(@Nullable LoadBalancer loadBalancer,
                              @Nullable io.micronaut.http.HttpVersion explicitHttpVersion,
@@ -322,7 +328,8 @@ public class DefaultHttpClient implements
                              Collection<ChannelPipelineListener> pipelineListeners,
                              NettyClientCustomizer clientCustomizer,
                              List<InvocationInstrumenterFactory> invocationInstrumenterFactories,
-                             @Nullable String informationalServiceId
+                             @Nullable String informationalServiceId,
+                             ConversionService conversionService
     ) {
         ArgumentUtils.requireNonNull("nettyClientSslBuilder", nettyClientSslBuilder);
         ArgumentUtils.requireNonNull("codecRegistry", codecRegistry);
@@ -372,6 +379,7 @@ public class DefaultHttpClient implements
             clientCustomizer,
             pipelineListeners,
             informationalServiceId);
+        this.conversionService = conversionService;
     }
 
     /**
@@ -398,7 +406,7 @@ public class DefaultHttpClient implements
                 new NettyClientSslBuilder(new ResourceResolver()),
                 createDefaultMediaTypeRegistry(),
                 AnnotationMetadataResolver.DEFAULT,
-                Collections.emptyList());
+                Collections.emptyList(), ConversionService.SHARED);
     }
 
     /**
@@ -406,13 +414,15 @@ public class DefaultHttpClient implements
      * @param configuration The {@link HttpClientConfiguration} object
      * @param invocationInstrumenterFactories The invocation instrumeter factories to instrument netty handlers execution with
      */
-    public DefaultHttpClient(@Nullable LoadBalancer loadBalancer, HttpClientConfiguration configuration, List<InvocationInstrumenterFactory> invocationInstrumenterFactories) {
+    public DefaultHttpClient(@Nullable LoadBalancer loadBalancer,
+                             HttpClientConfiguration configuration,
+                             List<InvocationInstrumenterFactory> invocationInstrumenterFactories) {
         this(loadBalancer,
                 configuration, null, new DefaultThreadFactory(MultithreadEventLoopGroup.class),
                 new NettyClientSslBuilder(new ResourceResolver()),
                 createDefaultMediaTypeRegistry(),
                 AnnotationMetadataResolver.DEFAULT,
-                invocationInstrumenterFactories);
+                invocationInstrumenterFactories, ConversionService.SHARED);
     }
 
     static boolean isAcceptEvents(io.micronaut.http.HttpRequest<?> request) {
@@ -838,7 +848,8 @@ public class DefaultHttpClient implements
             WebSocketClientHandshakerFactory.newHandshaker(
                 webSocketURL, protocolVersion, subprotocol, true, customHeaders, maxFramePayloadLength),
             requestBinderRegistry,
-            mediaTypeCodecRegistry);
+            mediaTypeCodecRegistry,
+            conversionService);
 
         return connectionManager.connectForWebsocket(requestKey, handler)
             .then(handler.getHandshakeCompletedMono());
@@ -1253,7 +1264,7 @@ public class DefaultHttpClient implements
                     if (Publishers.isConvertibleToPublisher(bodyValue)) {
                         boolean isSingle = Publishers.isSingle(bodyValue.getClass());
 
-                        Publisher<?> publisher = ConversionService.SHARED.convert(bodyValue, Publisher.class).orElseThrow(() ->
+                        Publisher<?> publisher = conversionService.convert(bodyValue, Publisher.class).orElseThrow(() ->
                                 new IllegalArgumentException("Unconvertible reactive type: " + bodyValue)
                         );
 
@@ -1335,7 +1346,7 @@ public class DefaultHttpClient implements
                                 .orElse(null);
                     }
                     if (bodyContent == null) {
-                        bodyContent = ConversionService.SHARED.convert(bodyValue, ByteBuf.class).orElseThrow(() ->
+                        bodyContent = conversionService.convert(bodyValue, ByteBuf.class).orElseThrow(() ->
                                 customizeException(new HttpClientException("Body [" + bodyValue + "] cannot be encoded to content type [" + requestContentType + "]. No possible codecs or converters found."))
                         );
                     }
@@ -1668,7 +1679,7 @@ public class DefaultHttpClient implements
     }
 
     private void addBodyAttribute(HttpPostRequestEncoder postRequestEncoder, String key, Object value) throws HttpPostRequestEncoder.ErrorDataEncoderException {
-        Optional<String> converted = ConversionService.SHARED.convert(value, String.class);
+        Optional<String> converted = conversionService.convert(value, String.class);
         if (converted.isPresent()) {
             postRequestEncoder.addBodyAttribute(key, converted.get());
         }

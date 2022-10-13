@@ -114,7 +114,7 @@ public class HttpClientIntroductionAdvice implements MethodInterceptor<Object, O
     private final HttpClientBinderRegistry binderRegistry;
     private final JsonMediaTypeCodec jsonMediaTypeCodec;
     private final HttpClientRegistry<?> clientFactory;
-    private final ConversionService<?> conversionService;
+    private final ConversionService conversionService;
 
     /**
      * Constructor for advice class to setup things like Headers, Cookies, Parameters for Clients.
@@ -130,7 +130,7 @@ public class HttpClientIntroductionAdvice implements MethodInterceptor<Object, O
             JsonMediaTypeCodec jsonMediaTypeCodec,
             List<ReactiveClientResultTransformer> transformers,
             HttpClientBinderRegistry binderRegistry,
-            ConversionService<?> conversionService) {
+            ConversionService conversionService) {
         this.clientFactory = clientFactory;
         this.jsonMediaTypeCodec = jsonMediaTypeCodec;
         this.transformers = transformers != null ? transformers : Collections.emptyList();

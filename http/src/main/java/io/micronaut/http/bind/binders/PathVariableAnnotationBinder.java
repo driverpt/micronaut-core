@@ -44,7 +44,7 @@ public class PathVariableAnnotationBinder<T> extends AbstractAnnotatedArgumentBi
     /**
      * @param conversionService The conversion service
      */
-    public PathVariableAnnotationBinder(ConversionService<?> conversionService) {
+    public PathVariableAnnotationBinder(ConversionService conversionService) {
         super(conversionService);
     }
 

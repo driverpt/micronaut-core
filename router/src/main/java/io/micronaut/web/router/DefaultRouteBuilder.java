@@ -69,7 +69,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
     static final Object NO_VALUE = new Object();
     protected final ExecutionHandleLocator executionHandleLocator;
     protected final UriNamingStrategy uriNamingStrategy;
-    protected final ConversionService<?> conversionService;
+    protected final ConversionService conversionService;
     protected final Charset defaultCharset;
 
     private DefaultUriRoute currentParentRoute = null;
@@ -99,7 +99,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
      * @param uriNamingStrategy The URI naming strategy
      * @param conversionService The conversion service
      */
-    public DefaultRouteBuilder(ExecutionHandleLocator executionHandleLocator, UriNamingStrategy uriNamingStrategy, ConversionService<?> conversionService) {
+    public DefaultRouteBuilder(ExecutionHandleLocator executionHandleLocator, UriNamingStrategy uriNamingStrategy, ConversionService conversionService) {
         this.executionHandleLocator = executionHandleLocator;
         this.uriNamingStrategy = uriNamingStrategy;
         this.conversionService = conversionService;
@@ -418,7 +418,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
     abstract class AbstractRoute implements MethodBasedRoute, RouteInfo<Object> {
         protected final List<Predicate<HttpRequest<?>>> conditions = new ArrayList<>();
         protected final MethodExecutionHandle<?, ?> targetMethod;
-        protected final ConversionService<?> conversionService;
+        protected final ConversionService conversionService;
         protected List<MediaType> consumesMediaTypes;
         protected List<MediaType> producesMediaTypes;
         protected String bodyArgumentName;
@@ -442,7 +442,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
          * @param conversionService The conversion service
          * @param mediaTypes The media types
          */
-        AbstractRoute(MethodExecutionHandle targetMethod, ConversionService<?> conversionService, List<MediaType> mediaTypes) {
+        AbstractRoute(MethodExecutionHandle targetMethod, ConversionService conversionService, List<MediaType> mediaTypes) {
             this.targetMethod = targetMethod;
             this.conversionService = conversionService;
             this.consumesMediaTypes = mediaTypes;
@@ -651,7 +651,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
          * @param targetMethod The target method execution handle
          * @param conversionService The conversion service
          */
-        public DefaultErrorRoute(Class<? extends Throwable> error, MethodExecutionHandle targetMethod, ConversionService<?> conversionService) {
+        public DefaultErrorRoute(Class<? extends Throwable> error, MethodExecutionHandle targetMethod, ConversionService conversionService) {
             this(null, error, targetMethod, conversionService);
         }
 
@@ -664,7 +664,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
         public DefaultErrorRoute(
                 Class originatingClass, Class<? extends Throwable> error,
                 MethodExecutionHandle targetMethod,
-                ConversionService<?> conversionService) {
+                ConversionService conversionService) {
             super(targetMethod, conversionService, Collections.emptyList());
             this.originatingClass = originatingClass;
             this.error = error;
@@ -772,7 +772,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
          * @param targetMethod The target method execution handle
          * @param conversionService The conversion service
          */
-        public DefaultStatusRoute(HttpStatus status, MethodExecutionHandle targetMethod, ConversionService<?> conversionService) {
+        public DefaultStatusRoute(HttpStatus status, MethodExecutionHandle targetMethod, ConversionService conversionService) {
             this(null, status, targetMethod, conversionService);
         }
 
@@ -782,7 +782,7 @@ public abstract class DefaultRouteBuilder implements RouteBuilder {
          * @param targetMethod The target method execution handle
          * @param conversionService The conversion service
          */
-        public DefaultStatusRoute(Class originatingClass, HttpStatus status, MethodExecutionHandle targetMethod, ConversionService<?> conversionService) {
+        public DefaultStatusRoute(Class originatingClass, HttpStatus status, MethodExecutionHandle targetMethod, ConversionService conversionService) {
             super(targetMethod, conversionService, Collections.emptyList());
             this.originatingClass = originatingClass;
             this.status = status;

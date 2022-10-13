@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class NettyHttpHeaders implements MutableHttpHeaders {
 
     io.netty.handler.codec.http.HttpHeaders nettyHeaders;
-    final ConversionService<?> conversionService;
+    final ConversionService conversionService;
 
     /**
      * @param nettyHeaders      The Netty Http headers
@@ -233,4 +233,8 @@ public class NettyHttpHeaders implements MutableHttpHeaders {
         return add(HttpHeaderNames.CONTENT_TYPE, mediaType);
     }
 
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
 }

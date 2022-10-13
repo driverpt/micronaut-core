@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class ConvertibleValuesMap<V> implements ConvertibleValues<V> {
 
     protected final Map<? extends CharSequence, V> map;
-    private final ConversionService<?> conversionService;
+    private final ConversionService conversionService;
 
     /**
      * Constructor.
@@ -59,7 +59,7 @@ public class ConvertibleValuesMap<V> implements ConvertibleValues<V> {
      * @param map map of values.
      * @param conversionService conversionService
      */
-    public ConvertibleValuesMap(Map<? extends CharSequence, V> map, ConversionService<?> conversionService) {
+    public ConvertibleValuesMap(Map<? extends CharSequence, V> map, ConversionService conversionService) {
         this.map = map;
         this.conversionService = conversionService;
     }

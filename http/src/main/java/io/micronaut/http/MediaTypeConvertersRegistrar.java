@@ -16,7 +16,7 @@
 package io.micronaut.http;
 
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.convert.ConversionService;
+import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.convert.TypeConverterRegistrar;
 import io.micronaut.core.util.StringUtils;
 
@@ -30,7 +30,7 @@ import io.micronaut.core.util.StringUtils;
 public final class MediaTypeConvertersRegistrar implements TypeConverterRegistrar {
 
     @Override
-    public void register(ConversionService<?> conversionService) {
+    public void register(MutableConversionService conversionService) {
         conversionService.addConverter(CharSequence.class, MediaType.class, charSequence -> {
                 if (StringUtils.isNotEmpty(charSequence)) {
                     return MediaType.of(charSequence.toString());

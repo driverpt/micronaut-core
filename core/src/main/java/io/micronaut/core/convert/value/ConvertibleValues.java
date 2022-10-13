@@ -19,11 +19,21 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.ConversionContext;
 import io.micronaut.core.convert.ConversionService;
+import io.micronaut.core.convert.ConversionServiceAware;
 import io.micronaut.core.reflect.GenericTypeUtils;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.value.ValueResolver;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -34,7 +44,7 @@ import java.util.stream.Collectors;
  * @author Graeme Rocher
  * @since 1.0
  */
-public interface ConvertibleValues<V> extends ValueResolver<CharSequence>, Iterable<Map.Entry<String, V>> {
+public interface ConvertibleValues<V> extends ValueResolver<CharSequence>, Iterable<Map.Entry<String, V>>, ConversionServiceAware {
 
     ConvertibleValues EMPTY = new ConvertibleValuesMap<>(Collections.emptyMap());
 
@@ -133,9 +143,9 @@ public interface ConvertibleValues<V> extends ValueResolver<CharSequence>, Itera
         Map<KT, VT> newMap = new LinkedHashMap<>();
         for (Map.Entry<String, V> entry : this) {
             String key = entry.getKey();
-            Optional<KT> convertedKey = ConversionService.SHARED.convert(key, keyType);
+            Optional<KT> convertedKey = getConversionService().convert(key, keyType);
             if (convertedKey.isPresent()) {
-                Optional<VT> convertedValue = ConversionService.SHARED.convert(entry.getValue(), valueType);
+                Optional<VT> convertedValue = getConversionService().convert(entry.getValue(), valueType);
                 convertedValue.ifPresent(vt -> newMap.put(convertedKey.get(), vt));
             }
         }
@@ -263,5 +273,10 @@ public interface ConvertibleValues<V> extends ValueResolver<CharSequence>, Itera
     @SuppressWarnings("unchecked")
     static <V> ConvertibleValues<V> empty() {
         return ConvertibleValues.EMPTY;
+    }
+
+    @Override
+    default ConversionService getConversionService() {
+        return ConversionService.SHARED;
     }
 }

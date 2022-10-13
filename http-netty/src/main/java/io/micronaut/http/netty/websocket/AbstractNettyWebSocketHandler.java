@@ -97,7 +97,7 @@ public abstract class AbstractNettyWebSocketHandler extends SimpleChannelInbound
     private final Argument<?> bodyArgument;
     private final Argument<?> pongArgument;
     private final AtomicBoolean closed = new AtomicBoolean(false);
-    private AtomicReference<CompositeByteBuf> frameBuffer = new AtomicReference<>();
+    private final AtomicReference<CompositeByteBuf> frameBuffer = new AtomicReference<>();
 
     /**
      * Default constructor.
@@ -111,6 +111,7 @@ public abstract class AbstractNettyWebSocketHandler extends SimpleChannelInbound
      * @param version                    The websocket version being used
      * @param subProtocol                The handler sub-protocol
      * @param webSocketSessionRepository The web socket repository if they are supported (like on the server), null otherwise
+     * @param conversionService          The conversion service
      */
     protected AbstractNettyWebSocketHandler(
             ChannelHandlerContext ctx,
@@ -121,10 +122,11 @@ public abstract class AbstractNettyWebSocketHandler extends SimpleChannelInbound
             Map<String, Object> uriVariables,
             WebSocketVersion version,
             String subProtocol,
-            WebSocketSessionRepository webSocketSessionRepository) {
+            WebSocketSessionRepository webSocketSessionRepository,
+            ConversionService conversionService) {
         this.subProtocol = subProtocol;
         this.webSocketSessionRepository = webSocketSessionRepository;
-        this.webSocketBinder = new WebSocketStateBinderRegistry(binderRegistry);
+        this.webSocketBinder = new WebSocketStateBinderRegistry(binderRegistry, conversionService);
         this.uriVariables = uriVariables;
         this.webSocketBean = webSocketBean;
         this.originatingRequest = request;

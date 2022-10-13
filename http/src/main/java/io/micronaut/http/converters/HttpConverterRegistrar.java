@@ -16,7 +16,7 @@
 package io.micronaut.http.converters;
 
 import io.micronaut.context.exceptions.ConfigurationException;
-import io.micronaut.core.convert.ConversionService;
+import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.convert.TypeConverterRegistrar;
 import io.micronaut.core.io.Readable;
 import io.micronaut.core.io.ResourceLoader;
@@ -54,7 +54,7 @@ public class HttpConverterRegistrar implements TypeConverterRegistrar {
     }
 
     @Override
-    public void register(ConversionService<?> conversionService) {
+    public void register(MutableConversionService conversionService) {
         conversionService.addConverter(String.class, HttpVersion.class, s -> {
             try {
                 return HttpVersion.valueOf(Double.parseDouble(s));
